@@ -22,13 +22,13 @@ public class UserController {
     //Create User API
     @PostMapping
     public ResponseEntity<User> saveUser(@RequestBody User user){
-//        if(!service.findByEmail(user.getEmail())) {
+     if(!service.findByEmail(user.getEmail())) {
             service.saveUser(user);
             return ResponseEntity.ok(user);
-//        }
-//        else{
-//            return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-//        }
+       }
+       else{
+          return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
+       }
     }
     //build all user get api
      @GetMapping
