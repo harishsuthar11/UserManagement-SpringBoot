@@ -30,7 +30,7 @@ public class UserController {
           return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
        }
     }
-    //build all user get api
+    
      @GetMapping
     public List<User> getallUsers(){
       return  service.getallUser();
