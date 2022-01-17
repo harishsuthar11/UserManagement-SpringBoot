@@ -3,17 +3,18 @@ package com.example.crudoperation.controller;
 
 import com.example.crudoperation.entity.User;
 import com.example.crudoperation.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin("*")
+//@CrossOrigin("*")
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
+    @Autowired
     private UserService service;
     public UserController(UserService service){
         super();
@@ -22,15 +23,11 @@ public class UserController {
     //Create User API
     @PostMapping
     public ResponseEntity<User> saveUser(@RequestBody User user){
-     if(!service.findByEmail(user.getEmail())) {
-            service.saveUser(user);
-            return ResponseEntity.ok(user);
-       }
-       else{
-          return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-       }
+
+            return new ResponseEntity<User>(service.saveUser(user),HttpStatus.CREATED);
+
     }
-    
+    //build all user get api
      @GetMapping
     public List<User> getallUsers(){
       return  service.getallUser();

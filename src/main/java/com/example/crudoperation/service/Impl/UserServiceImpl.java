@@ -4,6 +4,7 @@ import com.example.crudoperation.entity.User;
 import com.example.crudoperation.exception.ResourceNotFoundException;
 import com.example.crudoperation.repository.UserRepository;
 import com.example.crudoperation.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
-
+    @Autowired
     private UserRepository repo;
     public UserServiceImpl(UserRepository repo){
         super();
@@ -58,9 +59,17 @@ public class UserServiceImpl implements UserService {
                 new ResourceNotFoundException("User","id",id));
         repo.deleteById(id);
     }
-    public boolean findByEmail(String email){
-        boolean user = repo.findByEmail(email);
-        return user;
-    }
+//    public User findByEmail(String email){
+//        return repo.findByEmail(email);
+//    }
+//    public String doesExist(User user){
+//        boolean exists1 = repo.existsById(user.getId());
+//        if (exists1) return "username";
+//        List<User> exists2 = repo.findByEmailOrMobilenumber(user.getEmail(), user.getMobile());
+//        if (exists2.size() != 0) return "contact details";
+//        return "none";
+//    }
+
+
 
 }

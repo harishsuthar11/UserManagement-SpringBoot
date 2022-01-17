@@ -10,5 +10,6 @@ public interface UserService {
     User getUser(long id);
     User updateUser(User user,long id);
     void deleteUser(long id);
-    boolean findByEmail(String email);
+    //User findByEmail(String email);
+//    String doesExist(User user);
 }
