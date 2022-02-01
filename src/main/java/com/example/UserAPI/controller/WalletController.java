@@ -9,6 +9,7 @@ import com.example.UserAPI.service.TransactionService;
 import com.example.UserAPI.service.UserService;
 import com.example.UserAPI.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,12 +51,12 @@ public class WalletController {
         }
     }
     @RequestMapping(path = "/wallet/{walletid}/transactions",method = RequestMethod.GET)
-    public List<Transaction> getAllTransaction(@PathVariable String walletid){
+    public ResponseEntity<Page<Transaction>> getAllTransaction(@PathVariable String walletid,@RequestParam int pageNo){
 
         if(walletService.getWalletById(walletid)!=null){
             try {
-                List<Transaction> transactions = transactionService.getAllTransactionByWalletId(walletid);
-                return transactions;
+                Page<Transaction> transactions = transactionService.getAllTransactionByWalletId(walletid,pageNo);
+                return ResponseEntity.ok(transactions);
             }
             catch (Exception e){
                 throw new BadRequestException("No Transaction exist of that particular ID");
