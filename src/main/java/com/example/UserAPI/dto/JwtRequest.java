@@ -1,4 +1,4 @@
-package com.example.UserAPI.jwt.entity;
+package com.example.UserAPI.dto;
 
 import lombok.Data;
 

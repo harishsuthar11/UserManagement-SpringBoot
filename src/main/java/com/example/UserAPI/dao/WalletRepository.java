@@ -1,4 +1,4 @@
-package com.example.UserAPI.repository;
+package com.example.UserAPI.dao;
 
 import com.example.UserAPI.model.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;

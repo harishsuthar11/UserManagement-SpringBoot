@@ -1,7 +1,7 @@
 package com.example.UserAPI;
 
 import com.example.UserAPI.model.User;
-import com.example.UserAPI.repository.UserRepository;
+import com.example.UserAPI.dao.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

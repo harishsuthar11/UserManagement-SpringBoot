@@ -1,11 +1,9 @@
-package com.example.UserAPI.repository;
+package com.example.UserAPI.dao;
 
 import com.example.UserAPI.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User,Long> {
 //    @Query("SELECT u from user u where u.mobilenumber=?1")

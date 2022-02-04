@@ -1,7 +1,7 @@
 package com.example.UserAPI.service;
 
 import com.example.UserAPI.model.Wallet;
-import com.example.UserAPI.repository.WalletRepository;
+import com.example.UserAPI.dao.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

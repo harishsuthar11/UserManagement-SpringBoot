@@ -1,6 +1,6 @@
 package com.example.UserAPI.config;
 
-import com.example.UserAPI.jwt.util.JwtUtil;
+import com.example.UserAPI.util.JwtUtil;
 import com.example.UserAPI.service.CustomUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

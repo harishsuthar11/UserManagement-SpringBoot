@@ -2,7 +2,7 @@ package com.example.UserAPI.service;
 
 
 import com.example.UserAPI.model.Transaction;
-import com.example.UserAPI.repository.TransactionRepository;
+import com.example.UserAPI.dao.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 @Service
 @Transactional

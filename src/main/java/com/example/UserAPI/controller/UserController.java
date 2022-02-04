@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -18,6 +19,9 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private KafkaTemplate<String,String> kafkaTemplate;
+    String topic = "quickstart-events";
 
     @RequestMapping(value="/user")
     public ResponseEntity<List<User>> getUser(@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
@@ -42,6 +46,7 @@ public class UserController {
                 user.setCreateddate(new Date());
                 user.setModifieddate(new Date());
                 userService.saveUser(user);
+                kafkaTemplate.send(topic,"User Created Successfully");
                 return new ResponseEntity<>("User Created", HttpStatus.CREATED);
             } catch (Exception e) {
                 throw new BadRequestException("User Can't Be Created");

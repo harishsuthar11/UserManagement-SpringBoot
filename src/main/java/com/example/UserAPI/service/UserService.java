@@ -3,11 +3,9 @@ package com.example.UserAPI.service;
 
 import com.example.UserAPI.exception.ResourceNotFoundException;
 import com.example.UserAPI.model.User;
-import com.example.UserAPI.model.Wallet;
 
-import com.example.UserAPI.repository.UserRepository;
+import com.example.UserAPI.dao.UserRepository;
 
-import com.example.UserAPI.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
