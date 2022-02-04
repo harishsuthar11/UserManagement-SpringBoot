@@ -28,6 +28,8 @@ public class User {
     private String address1;
     @Column(name="address2")
     private String address2;
+    @Column(name = "password")
+    private String password;
 
     private String status;
     private Date createddate;

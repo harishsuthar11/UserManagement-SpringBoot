@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
+
 
 @RestController
 public class UserController {
@@ -20,15 +20,19 @@ public class UserController {
     private UserService userService;
 
     @RequestMapping(value="/user")
-    public List<User> getUser(){
-        return userService.getUsers();
+    public ResponseEntity<List<User>> getUser(@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
+        return new ResponseEntity<List<User>>(userService.getUsers(pageNumber,pageSize),HttpStatus.OK);
     }
     @RequestMapping(value="/user/{id}")
     public User getUserById(@PathVariable Long id){
         User user = userService.getUserById(id);
         return user;
     }
-    @PostMapping(value="/user")
+    @RequestMapping(value = "/user/filter")
+    public ResponseEntity<List<User>> getUsersByKeyword(@RequestParam String keyword){
+        return new ResponseEntity<List<User>>(userService.getUsersByKeyword(keyword),HttpStatus.OK);
+    }
+    @PostMapping(value="/create")
     public ResponseEntity<?> createUser(@RequestBody User user){
 
         if(userService.findByMobileno(user.getMobilenumber())==null) {
