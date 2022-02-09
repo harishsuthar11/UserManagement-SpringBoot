@@ -34,7 +34,9 @@ public class User {
     private String status;
     private Date createddate;
     private Date modifieddate;
+    //one wallet per user
     @OneToOne
     private Wallet wallet;
+
 
 }

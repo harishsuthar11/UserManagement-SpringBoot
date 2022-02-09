@@ -17,36 +17,60 @@ import java.util.List;
 @Service
 @Transactional
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
 
-    public List<User> getUsers(int pageNumber,int pageSize)
-    {
+    public List<User> getUsers(int pageNumber,int pageSize) {
+
         Pageable pageable = PageRequest.of(pageNumber,pageSize);
+
         return userRepository.findAll(pageable).getContent();
+
     }
     public User getUserById(Long id){
+
         User user = userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User ID Not exist"));
+
         return user;
+
     }
     @Transactional
     public void saveUser(User user){
+
         userRepository.save(user);
+
     }
     public void updateUser(User user){
+
         userRepository.save(user);
+
     }
     @Transactional
     public User findByMobileno(String mobilenumber){
+
         User user = userRepository.findByMobilenumber(mobilenumber);
+
         return user;
+
     }
     public List<User> getUsersByKeyword(String keyword){
+
         List<User> userList = userRepository.findByUsernameContaining(keyword);
+
         return userList;
+
     }
     public User findByUsername(String username){
+
         return userRepository.findByUsername(username);
+
+    }
+
+    public void deleteUser(long id){
+
+        userRepository.deleteById(id);
+
     }
 
 }

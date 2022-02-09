@@ -16,11 +16,15 @@ public class WalletService {
     private WalletRepository walletRepository;
 
     public void saveWallet(Wallet wallet){
+
         walletRepository.save(wallet);
 
     }
 
     public Optional<Wallet> getWalletById(String walletid){
+
         return walletRepository.findById(walletid);
+
     }
+
 }

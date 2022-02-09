@@ -17,12 +17,20 @@ public class TransactionService {
 
     @Autowired
     private TransactionRepository transactionRepository;
+    @Transactional
     public void createTransaction(Transaction transaction){
+
         transactionRepository.save(transaction);
+
     }
+    @Transactional
     public Page<Transaction> getAllTransactionByWalletId(String walletId,int pageNo){
+
         Pageable pageable = PageRequest.of(pageNo,2);
+
         Page<Transaction> transactions = transactionRepository.findByWalletId(walletId,walletId,pageable);
+
         return transactions;
+
     }
 }
