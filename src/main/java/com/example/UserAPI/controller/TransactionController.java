@@ -1,6 +1,8 @@
 package com.example.UserAPI.controller;
 
 
+import com.example.UserAPI.dao.TransactionRepository;
+import com.example.UserAPI.dto.ResponseObject;
 import com.example.UserAPI.exception.BadRequestException;
 import com.example.UserAPI.exception.ResourceNotFoundException;
 import com.example.UserAPI.model.Transaction;
@@ -10,51 +12,96 @@ import com.example.UserAPI.service.UserService;
 import com.example.UserAPI.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 
 @RestController
 public class TransactionController {
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private WalletService walletService;
+
     @Autowired
     private TransactionService transactionService;
 
+    @Autowired
+    private TransactionRepository transactionRepository;
+
     @RequestMapping(path = "/transaction",method = RequestMethod.POST)
-    public ResponseEntity<?> makeTransaction(@RequestBody Transaction transaction){
+
+    public ResponseObject makeTransaction(@RequestBody Transaction transaction){
+        //GET Wallet Corresponding to Transaction
+        String payer_walletId = transaction.getPayerWalletId();
+        String payee_walletId = transaction.getPayeeWalletId();
+
         Wallet payerWallet = walletService.getWalletById(transaction.getPayerWalletId()).orElseThrow(()->new ResourceNotFoundException("Payer Wallet ID Not exist!"));
         Wallet payeeWallet = walletService.getWalletById(transaction.getPayeeWalletId()).orElseThrow(()->new ResourceNotFoundException("Payee Wallet ID Not exist"));
 
         float currentBalancePayer=payerWallet.getBalance();
+
         if(transaction.getAmount()>currentBalancePayer){
-            return new ResponseEntity<>("Insufficient Balance", HttpStatus.BAD_REQUEST);
+            return new ResponseObject(HttpStatus.BAD_REQUEST,"Insufficient Balance");
         }
+
         float currentBalancePayee=payeeWallet.getBalance();
+
+
+        Wallet tempWallet1= payerWallet;
+        Wallet tempWallet2 = payeeWallet;
+
         try {
+
             currentBalancePayee = currentBalancePayee+transaction.getAmount();
             currentBalancePayer = currentBalancePayer- transaction.getAmount();
             payerWallet.setBalance(currentBalancePayer);
             payeeWallet.setBalance(currentBalancePayee);
-            walletService.saveWallet(payeeWallet);
-            walletService.saveWallet(payerWallet);
             transaction.setStatus("SUCCESS");
             transaction.setTimestamp(new Timestamp(System.currentTimeMillis()));
+
             transactionService.createTransaction(transaction);
-            return new ResponseEntity<>("Transaction Successful",HttpStatus.CREATED);
+
+            walletService.updateWallet(payeeWallet);
+            walletService.updateWallet(payerWallet);
+
+            return new ResponseObject(HttpStatus.CREATED,"Transaction Successful!");
         }
+
         catch (Exception e){
+
+            walletService.updateWallet(tempWallet1);
+            walletService.updateWallet(tempWallet2);
             transaction.setStatus("FAILED");
             transaction.setTimestamp(new Timestamp(System.currentTimeMillis()));
             transactionService.createTransaction(transaction);
             throw new BadRequestException("Transaction failed");
+
         }
+    }
+
+    @RequestMapping(path = "/transaction",method = RequestMethod.GET)
+
+    public Transaction getTransactionById(@RequestParam Long transactionId){
+
+        Transaction transaction;
+
+        try{
+
+             transaction = transactionRepository.findByTransactionId(transactionId);
+
+        }
+
+        catch (Exception e){
+
+            throw new ResourceNotFoundException("TransactionID not exist");
+
+        }
+
+        return transaction;
+
     }
 }
 

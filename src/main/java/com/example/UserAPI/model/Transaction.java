@@ -10,13 +10,17 @@ import java.sql.Timestamp;
 @Data
 @Table(name="transaction")
 public class Transaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionId;
+
     @Column(name = "payerWalletId",unique = true,nullable = false)
     private String payerWalletId;
+
     @Column(name = "payeeWalletId",unique = true,nullable = false)
     private String payeeWalletId;
+
     @Column(name = "amount")
     private float amount;
 

@@ -6,12 +6,10 @@ import com.example.UserAPI.exception.BadRequestException;
 import com.example.UserAPI.model.User;
 import com.example.UserAPI.service.UserService;
 import com.example.UserAPI.validation.Validation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -20,15 +18,17 @@ import java.util.List;
 
 @RestController
 public class UserController {
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private Validation validation;
 //    @Autowired
 //    private KafkaTemplate<String,String> kafkaTemplate;
 //    String topic = "quickstart-events";
 
-    private static Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static Logger logger = Logger.getLogger(UserController.class);
 
     //This Mapping is to get all the users
     //Request URL : http://localhost:8080/user?pageNumber=<pageNumber>&pageSize=<pageSize>
@@ -46,8 +46,10 @@ public class UserController {
     @RequestMapping(value="/user/{id}")
     public User getUserById(@PathVariable Long id){
 
-        User user = userService.getUserById(id);
+        logger.debug("Getting User Details");
 
+        User user = userService.getUserById(id);
+        logger.info("User found with Name "+user.getFirstname()+" "+user.getLastname());
         return user;
 
     }
@@ -68,15 +70,23 @@ public class UserController {
     //URL:http://localhost:8080/create
 
     @PostMapping(value="/create")
+    public ResponseObject createUser(@RequestBody User user){
 
-    public ResponseEntity<?> createUser(@RequestBody User user){
+        logger.debug("Accessing Create User");
 
-        if(!validation.emailValidation(user.getEmail()))
-            return new ResponseEntity<>("Email is Invalid",HttpStatus.BAD_REQUEST);
+        if(!validation.emailValidation(user.getEmail())) {
 
-        if(!validation.mobileNumberValidate(user.getMobilenumber()))
-            return new ResponseEntity<>("Mobile number is Invalid",HttpStatus.BAD_REQUEST);
+            logger.debug("Email  is Not Valid");
+            return new ResponseObject(HttpStatus.BAD_REQUEST, "Email Invalid");
 
+        }
+
+        if(!validation.mobileNumberValidate(user.getMobilenumber())){
+
+            logger.debug("Mobile Number is Invalid");
+            return new ResponseObject(HttpStatus.BAD_REQUEST,"Invalid Mobile Number");
+
+        }
         if(userService.findByMobileno(user.getMobilenumber())==null) {
 
             try {
@@ -88,8 +98,8 @@ public class UserController {
 
                 userService.saveUser(user);
 //                kafkaTemplate.send(topic,"User Created Successfully");
-
-                return new ResponseEntity<>("User Created", HttpStatus.CREATED);
+                logger.info("User Created with name "+user.getFirstname()+" "+user.getLastname());
+                return new ResponseObject( HttpStatus.CREATED,"User Created");
 
             }
             catch (Exception e) {
@@ -102,30 +112,36 @@ public class UserController {
 
         else
         {
-
-            return new ResponseEntity<>("User already exist", HttpStatus.CONFLICT);
+            logger.info("Username Already Exist "+user.getUsername());
+            return new ResponseObject(HttpStatus.ALREADY_REPORTED,"User already exist");
 
         }
     }
 
     @PutMapping(value = "/user/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id,@RequestBody User user){
+    public ResponseObject updateUser(@PathVariable Long id,@RequestBody User user){
+
         user.setModifieddate(new Date());
         userService.saveUser(user);
-        return new ResponseEntity<>("User updated",HttpStatus.OK);
+        return new ResponseObject(HttpStatus.OK,"Updated Successfully");
 
     }
 
     @DeleteMapping(value = "/user/{id}")
-    public void deleteUser(@PathVariable long id){
+    public ResponseObject deleteUser(@PathVariable long id){
 
         try {
+
             logger.debug("user deleted");
             userService.deleteUser(id);
-        }catch (Exception e){
-            throw new BadRequestException("Can't be deleted");
-        }
 
+        }
+        catch (Exception e){
+
+            throw new BadRequestException("Can't be deleted");
+
+        }
+       return  new ResponseObject(HttpStatus.ACCEPTED,"User Deleted");
 
 
     }

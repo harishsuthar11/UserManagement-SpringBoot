@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +25,19 @@ public class WalletService {
     public Optional<Wallet> getWalletById(String walletid){
 
         return walletRepository.findById(walletid);
+
+    }
+
+    public Wallet updateWallet(Wallet wallet){
+
+        walletRepository.save(wallet);
+        return wallet;
+
+    }
+
+    public List<Wallet> getAll(){
+
+        return walletRepository.findAll();
 
     }
 

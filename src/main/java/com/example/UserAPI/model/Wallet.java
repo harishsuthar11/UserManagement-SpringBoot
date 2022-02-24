@@ -10,7 +10,6 @@ import javax.persistence.*;
 @Table(name="wallet")
 public class Wallet {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private String walletid;
 
     private float balance;

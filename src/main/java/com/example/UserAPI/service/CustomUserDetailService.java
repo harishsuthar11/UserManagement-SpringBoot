@@ -14,15 +14,19 @@ import java.util.ArrayList;
 
 @Service
 public class CustomUserDetailService implements UserDetailsService {
+
     @Autowired
     private  UserService userService;
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
         try{
             com.example.UserAPI.model.User user = userService.findByUsername(username);
             return new User(user.getUsername(),user.getPassword(),new ArrayList<>());
         }
+
         catch (Exception e){
             throw new ResourceNotFoundException("Not Found");
         }

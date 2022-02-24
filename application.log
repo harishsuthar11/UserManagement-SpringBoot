@@ -1,0 +1,11 @@
+2022-02-23 16:15:31,431 DEBUG [http-nio-8080-exec-2] UserController:73 -Accessing Create User
+2022-02-23 16:16:37,999 DEBUG [http-nio-8080-exec-5] UserController:73 -Accessing Create User
+2022-02-23 16:16:38,072  INFO [http-nio-8080-exec-5] UserController:92 -User Created with name Shrawan Suthar
+2022-02-23 16:24:04,214 DEBUG [http-nio-8080-exec-1] UserController:73 -Accessing Create User
+2022-02-23 16:24:04,418  INFO [http-nio-8080-exec-1] UserController:110 -Username Already Exist ss
+2022-02-23 16:29:18,310 DEBUG [http-nio-8080-exec-1] UserController:73 -Accessing Create User
+2022-02-23 16:29:18,523  INFO [http-nio-8080-exec-1] UserController:110 -Username Already Exist ss
+2022-02-23 16:39:42,606 DEBUG [http-nio-8080-exec-1] UserController:73 -Accessing Create User
+2022-02-23 16:39:42,824  INFO [http-nio-8080-exec-1] UserController:110 -Username Already Exist ss
+2022-02-23 16:51:22,309 DEBUG [http-nio-8080-exec-5] UserController:73 -Accessing Create User
+2022-02-23 16:51:22,324  INFO [http-nio-8080-exec-5] UserController:110 -Username Already Exist hks

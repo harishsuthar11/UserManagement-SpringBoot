@@ -1,5 +1,6 @@
 package com.example.UserAPI;
 
+import com.example.UserAPI.controller.UserController;
 import com.example.UserAPI.dto.JwtRequest;
 import com.example.UserAPI.dto.JwtResponse;
 import com.example.UserAPI.dto.ResponseObject;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +32,7 @@ import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@WebMvcTest(controllers = UserController.class)
 class UserApiApplicationTests {
 	@Autowired
 	MockMvc mockMvc;

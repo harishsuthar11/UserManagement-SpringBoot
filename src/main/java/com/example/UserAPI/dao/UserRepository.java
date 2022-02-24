@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<User,Long> {
 //    @Query("SELECT u from user u where u.mobilenumber=?1")
-     public User findByMobilenumber(String mobilenumber);
+     User findByMobilenumber(String mobilenumber);
      List<User> findByUsernameContaining(String keyword);
      User findByUsername(String username);
 
