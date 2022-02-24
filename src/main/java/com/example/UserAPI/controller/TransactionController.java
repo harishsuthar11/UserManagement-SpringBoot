@@ -10,6 +10,7 @@ import com.example.UserAPI.model.Wallet;
 import com.example.UserAPI.service.TransactionService;
 import com.example.UserAPI.service.UserService;
 import com.example.UserAPI.service.WalletService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -31,19 +32,23 @@ public class TransactionController {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    private static Logger logger = Logger.getLogger(TransactionController.class);
+
     @RequestMapping(path = "/transaction",method = RequestMethod.POST)
 
     public ResponseObject makeTransaction(@RequestBody Transaction transaction){
         //GET Wallet Corresponding to Transaction
+        logger.debug("Getting Wallet ID of Payer and Payees");
         String payer_walletId = transaction.getPayerWalletId();
         String payee_walletId = transaction.getPayeeWalletId();
 
         Wallet payerWallet = walletService.getWalletById(transaction.getPayerWalletId()).orElseThrow(()->new ResourceNotFoundException("Payer Wallet ID Not exist!"));
         Wallet payeeWallet = walletService.getWalletById(transaction.getPayeeWalletId()).orElseThrow(()->new ResourceNotFoundException("Payee Wallet ID Not exist"));
-
+        logger.debug("Getting Balance of the Payer");
         float currentBalancePayer=payerWallet.getBalance();
 
         if(transaction.getAmount()>currentBalancePayer){
+            logger.warn("Insufficient Balance");
             return new ResponseObject(HttpStatus.BAD_REQUEST,"Insufficient Balance");
         }
 
@@ -54,7 +59,7 @@ public class TransactionController {
         Wallet tempWallet2 = payeeWallet;
 
         try {
-
+            logger.debug("Credit amount to the Payer Wallet and Debit to Payees");
             currentBalancePayee = currentBalancePayee+transaction.getAmount();
             currentBalancePayer = currentBalancePayer- transaction.getAmount();
             payerWallet.setBalance(currentBalancePayer);
@@ -66,7 +71,7 @@ public class TransactionController {
 
             walletService.updateWallet(payeeWallet);
             walletService.updateWallet(payerWallet);
-
+            logger.info("Transaction Successful");
             return new ResponseObject(HttpStatus.CREATED,"Transaction Successful!");
         }
 
@@ -77,6 +82,7 @@ public class TransactionController {
             transaction.setStatus("FAILED");
             transaction.setTimestamp(new Timestamp(System.currentTimeMillis()));
             transactionService.createTransaction(transaction);
+            logger.error("Transaction Failed");
             throw new BadRequestException("Transaction failed");
 
         }
@@ -89,13 +95,13 @@ public class TransactionController {
         Transaction transaction;
 
         try{
-
+             logger.debug("Getting Transaction by TransactionId");
              transaction = transactionRepository.findByTransactionId(transactionId);
 
         }
 
         catch (Exception e){
-
+            logger.error("Transaction ID Not exist");
             throw new ResourceNotFoundException("TransactionID not exist");
 
         }
