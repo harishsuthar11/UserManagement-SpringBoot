@@ -9,3 +9,15 @@
 2022-02-23 16:39:42,824  INFO [http-nio-8080-exec-1] UserController:110 -Username Already Exist ss
 2022-02-23 16:51:22,309 DEBUG [http-nio-8080-exec-5] UserController:73 -Accessing Create User
 2022-02-23 16:51:22,324  INFO [http-nio-8080-exec-5] UserController:110 -Username Already Exist hks
+2022-02-24 12:03:10,760 DEBUG [http-nio-8080-exec-1] UserController:77 -Accessing Create User
+2022-02-24 12:03:11,024  INFO [http-nio-8080-exec-1] UserController:103 -User Created with name Ramesh Suthar
+2022-02-24 12:04:25,955 DEBUG [http-nio-8080-exec-5] UserController:77 -Accessing Create User
+2022-02-24 12:04:25,984  INFO [http-nio-8080-exec-5] UserController:118 -Username Already Exist ss
+2022-02-24 12:04:49,895 DEBUG [http-nio-8080-exec-6] UserController:77 -Accessing Create User
+2022-02-24 12:04:49,927  INFO [http-nio-8080-exec-6] UserController:118 -Username Already Exist rs
+2022-02-24 12:05:18,316 DEBUG [http-nio-8080-exec-7] UserController:77 -Accessing Create User
+2022-02-24 12:06:06,135 DEBUG [http-nio-8080-exec-9] UserController:77 -Accessing Create User
+2022-02-24 12:06:28,899 DEBUG [http-nio-8080-exec-10] UserController:77 -Accessing Create User
+2022-02-24 12:06:28,926  INFO [http-nio-8080-exec-10] UserController:103 -User Created with name Ramesh Suthar
+2022-02-24 12:14:26,317 DEBUG [http-nio-8080-exec-3] UserController:77 -Accessing Create User
+2022-02-24 12:14:26,378  INFO [http-nio-8080-exec-3] UserController:103 -User Created with name Ramesh Suthar

@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -24,18 +25,19 @@ public class UserController {
 
     @Autowired
     private Validation validation;
-//    @Autowired
-//    private KafkaTemplate<String,String> kafkaTemplate;
-//    String topic = "quickstart-events";
+   @Autowired
+    private KafkaTemplate<String,Object> kafkaTemplate;
+    String topic = "user";
 
     private static Logger logger = Logger.getLogger(UserController.class);
+
 
     //This Mapping is to get all the users
     //Request URL : http://localhost:8080/user?pageNumber=<pageNumber>&pageSize=<pageSize>
 
     @RequestMapping(value="/user")
     public ResponseEntity<List<User>> getUser(@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
-
+        kafkaTemplate.send(topic,"Getting User");
         return new ResponseEntity<List<User>>(userService.getUsers(pageNumber,pageSize),HttpStatus.OK);
 
     }
@@ -99,6 +101,7 @@ public class UserController {
                 userService.saveUser(user);
 //                kafkaTemplate.send(topic,"User Created Successfully");
                 logger.info("User Created with name "+user.getFirstname()+" "+user.getLastname());
+                kafkaTemplate.send(topic,user.getEmail());
                 return new ResponseObject( HttpStatus.CREATED,"User Created");
 
             }
