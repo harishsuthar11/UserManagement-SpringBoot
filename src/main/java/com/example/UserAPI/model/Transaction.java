@@ -15,10 +15,12 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionId;
 
-    @Column(name = "payerWalletId",unique = true,nullable = false)
+    @Column(name = "payerWalletId",nullable = false)
+
     private String payerWalletId;
 
-    @Column(name = "payeeWalletId",unique = true,nullable = false)
+    @Column(name = "payeeWalletId",nullable = false)
+
     private String payeeWalletId;
 
     @Column(name = "amount")

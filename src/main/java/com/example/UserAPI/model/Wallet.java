@@ -14,4 +14,9 @@ public class Wallet {
 
     private float balance;
 
+
+
+
+
+
 }

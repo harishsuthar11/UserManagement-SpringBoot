@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Date;
 import java.util.List;
@@ -24,9 +25,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private Validation validation;
-   @Autowired
-    private KafkaTemplate<String,Object> kafkaTemplate;
+    private KafkaTemplate<String,String> kafkaTemplate;
     String topic = "user";
 
     private static Logger logger = Logger.getLogger(UserController.class);
@@ -37,7 +36,8 @@ public class UserController {
 
     @RequestMapping(value="/user")
     public ResponseEntity<List<User>> getUser(@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
-        kafkaTemplate.send(topic,"Getting User");
+        //kafkaTemplate.send(topic,"Getting User");
+        logger.debug("Getting Users ...");
         return new ResponseEntity<List<User>>(userService.getUsers(pageNumber,pageSize),HttpStatus.OK);
 
     }
@@ -48,7 +48,7 @@ public class UserController {
     @RequestMapping(value="/user/{id}")
     public User getUserById(@PathVariable Long id){
 
-        logger.debug("Getting User Details");
+        logger.debug("Getting User Details having UserID "+id);
 
         User user = userService.getUserById(id);
         logger.info("User found with Name "+user.getFirstname()+" "+user.getLastname());
@@ -62,7 +62,7 @@ public class UserController {
 
     @RequestMapping(value = "/user/filter")
     public ResponseEntity<List<User>> getUsersByKeyword(@RequestParam String keyword){
-
+        logger.debug("Getting Users with the Keyword "+keyword);
         return new ResponseEntity<List<User>>(userService.getUsersByKeyword(keyword),HttpStatus.OK);
 
     }
@@ -74,21 +74,9 @@ public class UserController {
     @PostMapping(value="/create")
     public ResponseObject createUser(@RequestBody User user){
 
-        logger.debug("Accessing Create User");
+        logger.debug("Accessing Create User API");
 
-        if(!validation.emailValidation(user.getEmail())) {
 
-            logger.debug("Email  is Not Valid");
-            return new ResponseObject(HttpStatus.BAD_REQUEST, "Email Invalid");
-
-        }
-
-        if(!validation.mobileNumberValidate(user.getMobilenumber())){
-
-            logger.debug("Mobile Number is Invalid");
-            return new ResponseObject(HttpStatus.BAD_REQUEST,"Invalid Mobile Number");
-
-        }
         if(userService.findByMobileno(user.getMobilenumber())==null) {
 
             try {
@@ -101,7 +89,7 @@ public class UserController {
                 userService.saveUser(user);
 //                kafkaTemplate.send(topic,"User Created Successfully");
                 logger.info("User Created with name "+user.getFirstname()+" "+user.getLastname());
-                kafkaTemplate.send(topic,user.getEmail());
+       //         kafkaTemplate.send(topic,user.getEmail());
                 return new ResponseObject( HttpStatus.CREATED,"User Created");
 
             }

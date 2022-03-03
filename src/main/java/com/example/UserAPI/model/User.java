@@ -43,7 +43,8 @@ public class User {
     private Date createddate;
     private Date modifieddate;
     //one wallet per user
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "walletid",referencedColumnName = "walletid")
     private Wallet wallet;
 
 

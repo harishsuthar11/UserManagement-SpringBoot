@@ -1,10 +1,9 @@
-package com.example.UserAPI.dao;
+package com.example.UserAPI.repository;
 
 import com.example.UserAPI.model.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 public interface TransactionRepository extends JpaRepository<Transaction,Long> {
 

@@ -1,7 +1,7 @@
 package com.example.UserAPI.service;
 
 import com.example.UserAPI.model.Wallet;
-import com.example.UserAPI.dao.WalletRepository;
+import com.example.UserAPI.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +16,9 @@ public class WalletService {
     @Autowired
     private WalletRepository walletRepository;
 
-    public void saveWallet(Wallet wallet){
+    public Wallet saveWallet(Wallet wallet){
 
-        walletRepository.save(wallet);
+        return walletRepository.save(wallet);
 
     }
 
@@ -40,5 +40,6 @@ public class WalletService {
         return walletRepository.findAll();
 
     }
+
 
 }

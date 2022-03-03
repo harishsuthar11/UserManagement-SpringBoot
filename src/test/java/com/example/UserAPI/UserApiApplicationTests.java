@@ -5,7 +5,7 @@ import com.example.UserAPI.dto.JwtRequest;
 import com.example.UserAPI.dto.JwtResponse;
 import com.example.UserAPI.dto.ResponseObject;
 import com.example.UserAPI.model.User;
-import com.example.UserAPI.dao.UserRepository;
+import com.example.UserAPI.repository.UserRepository;
 import com.example.UserAPI.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -20,15 +20,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import static org.junit.jupiter.api.Assertions.*;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc

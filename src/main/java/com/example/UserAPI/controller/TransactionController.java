@@ -1,7 +1,7 @@
 package com.example.UserAPI.controller;
 
 
-import com.example.UserAPI.dao.TransactionRepository;
+import com.example.UserAPI.repository.TransactionRepository;
 import com.example.UserAPI.dto.ResponseObject;
 import com.example.UserAPI.exception.BadRequestException;
 import com.example.UserAPI.exception.ResourceNotFoundException;
@@ -38,6 +38,7 @@ public class TransactionController {
 
     public ResponseObject makeTransaction(@RequestBody Transaction transaction){
         //GET Wallet Corresponding to Transaction
+
         logger.debug("Getting Wallet ID of Payer and Payees");
         String payer_walletId = transaction.getPayerWalletId();
         String payee_walletId = transaction.getPayeeWalletId();
@@ -60,18 +61,19 @@ public class TransactionController {
 
         try {
             logger.debug("Credit amount to the Payer Wallet and Debit to Payees");
-            currentBalancePayee = currentBalancePayee+transaction.getAmount();
-            currentBalancePayer = currentBalancePayer- transaction.getAmount();
+            currentBalancePayee +=transaction.getAmount();
+            currentBalancePayer += transaction.getAmount();
             payerWallet.setBalance(currentBalancePayer);
             payeeWallet.setBalance(currentBalancePayee);
+
             transaction.setStatus("SUCCESS");
             transaction.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
             transactionService.createTransaction(transaction);
-
+            logger.info("Transaction Successful"+transaction.getTransactionId());
             walletService.updateWallet(payeeWallet);
             walletService.updateWallet(payerWallet);
-            logger.info("Transaction Successful");
+
             return new ResponseObject(HttpStatus.CREATED,"Transaction Successful!");
         }
 

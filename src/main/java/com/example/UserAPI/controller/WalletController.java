@@ -35,15 +35,15 @@ public class WalletController {
 
     private static Logger logger = Logger.getLogger(WalletController.class);
 
-    //Authentication
-
-    public String getUsernameByToken(){
-        logger.debug("Authenticating the User");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        logger.info("Username of Authenticated User"+username);
-        return username;
-    }
+//    //Authentication
+//
+//    public String getUsernameByToken(){
+//        logger.debug("Authenticating the User");
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String username = authentication.getName();
+//        logger.info("Username of Authenticated User "+username);
+//        return username;
+//    }
 
     //Create Wallet
 
@@ -56,11 +56,11 @@ public class WalletController {
             logger.debug("Finding User Corresponding to Mobile Number");
             User user = userService.findByMobileno(mobilenumber);
 
-            String requestTokenUsername = getUsernameByToken();
-            if(user.getUsername().compareTo(requestTokenUsername)!=0){
-                logger.error("Unauthorized !!! Use Your Own Token");
-                return new ResponseObject(HttpStatus.UNAUTHORIZED,"Authentication Failed");
-            }
+//            String requestTokenUsername = getUsernameByToken();
+//            if(user.getUsername().compareTo(requestTokenUsername)!=0){
+//                logger.error("Unauthorized !!! Use Your Own Token");
+//                return new ResponseObject(HttpStatus.UNAUTHORIZED,"Authentication Failed");
+//            }
 
                 //Fetch the wallet of particular mobile number
 
@@ -137,12 +137,12 @@ public class WalletController {
         try {
             User user = userService.findByMobileno(walletid);
 
-            String requestTokenUsername = getUsernameByToken();
-            if (user.getUsername().compareTo(requestTokenUsername) != 0) {
-                logger.error("Unauthorized !!! Use Your Own Token");
-                throw new BadRequestException("Authentication Failed");
-
-             }
+//            String requestTokenUsername = getUsernameByToken();
+//            if (user.getUsername().compareTo(requestTokenUsername) != 0) {
+//                logger.error("Unauthorized !!! Use Your Own Token");
+//                throw new BadRequestException("Authentication Failed");
+//
+//             }
             }
         catch (Exception exception) {
             logger.error("Transaction ID Not Found");

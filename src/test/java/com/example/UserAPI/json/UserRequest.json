@@ -1,10 +1,14 @@
 {
   "id": 9,
-  "username": "hks",
-  "firstname": "Deepa",
-  "lastname": "Ram",
-  "email": "drs@gmail.com",
-  "mobilenumber": "9878965643",
+  "username": "hs11",
+  "firstname": "Harish",
+  "lastname": "Suthar",
+  "email": "hs11@gmail.com",
+  "mobilenumber": "9999999999",
   "address1": "Jalore",
-  "address2": "Bhinmal"
+  "address2": "Bhinmal",
+  "password": "123",
+  "status": "ACTIVE",
+  "createddate": "2022-02-24T10:33:08.000+00:00",
+  "modifieddate": "2022-02-24T10:33:08.000+00:00"
 }
