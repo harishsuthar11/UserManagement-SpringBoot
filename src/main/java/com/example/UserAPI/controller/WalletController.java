@@ -11,12 +11,16 @@ import com.example.UserAPI.service.UserService;
 import com.example.UserAPI.service.WalletService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,62 +37,25 @@ public class WalletController {
     @Autowired
     private TransactionService transactionService;
 
-    private static Logger logger = Logger.getLogger(WalletController.class);
+    private static Logger logger = Logger.getLogger(WalletController.class.getName());
 
-//    //Authentication
-//
-//    public String getUsernameByToken(){
-//        logger.debug("Authenticating the User");
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String username = authentication.getName();
-//        logger.info("Username of Authenticated User "+username);
-//        return username;
-//    }
+    @Autowired
+    private KafkaTemplate<String,String> kafkaTemplate;
+
+    private static final String topic = "user";
+
+
 
     //Create Wallet
 
     @PostMapping(value = "/wallet/{mobilenumber}")
     public ResponseObject createWallet(@PathVariable String mobilenumber) {
         logger.info("Into the Create Wallet Method");
-        try {
-
-                //Find the user corresponding to Mobilenumber
-            logger.debug("Finding User Corresponding to Mobile Number");
-            User user = userService.findByMobileno(mobilenumber);
-
-//            String requestTokenUsername = getUsernameByToken();
-//            if(user.getUsername().compareTo(requestTokenUsername)!=0){
-//                logger.error("Unauthorized !!! Use Your Own Token");
-//                return new ResponseObject(HttpStatus.UNAUTHORIZED,"Authentication Failed");
-//            }
-
-                //Fetch the wallet of particular mobile number
-
-            Optional<Wallet> wallet1 = walletService.getWalletById(mobilenumber);
-
-
-                //if it's not present then create it
-            if (!wallet1.isPresent()) {
-
-                Wallet wallet = new Wallet();
-                wallet.setWalletid(mobilenumber);
-                wallet.setBalance(0.0F);
-                walletService.saveWallet(wallet);
-                user.setWallet(wallet);
-                userService.saveUser(user);
-                logger.info("Wallet Created");
-                return new ResponseObject(HttpStatus.OK, "Wallet Created");
-            }
-                //Else throw error wallet already exist
-            else {
-                logger.warn("Wallet Already exist");
-                return new ResponseObject(HttpStatus.BAD_REQUEST, "Wallet Already exist");
-            }
+        try{
+            return walletService.saveWallet(mobilenumber);
         }
-        catch (Exception e) {
-            logger.error("User not found corresponding to Mobile Number");
-            return new ResponseObject(HttpStatus.NOT_FOUND, "User not found !!!");
-
+        catch (Exception e){
+            throw new BadRequestException("Wallet Can't Be Created");
         }
 
 
@@ -100,89 +67,64 @@ public class WalletController {
     public ResponseObject addMoneyInWallet(@PathVariable String walletid, @PathVariable float balance) {
 
         logger.info("Into the Method Add Money to Wallet");
+        try{
+            ResponseObject responseObject = walletService.addMoney(walletid,balance);
+            try{
 
-        Wallet wallet = walletService.getWalletById(walletid).orElseThrow(() -> new ResourceNotFoundException("WalletID Not Exist"));
+                if(responseObject.getHttpStatus().compareTo(HttpStatus.ACCEPTED)==0){
+                    kafkaTemplate.send(topic,"Money Added to Wallet with ID :"+walletid+" And Amount "+balance+" with TimeStamp "+Timestamp.from(Instant.now()));
+                }
 
-        try {
+            }catch (Exception e){
+                throw new BadRequestException("Can't Push Event in Kafka");
+            }
+            return responseObject;
 
-            wallet.setBalance(balance);
-            walletService.saveWallet(wallet);
-
-            Transaction transaction = new Transaction();
-            transaction.setAmount(balance);
-            transaction.setStatus("SUCCESS");
-            transaction.setTimestamp(new Timestamp(System.currentTimeMillis()));
-            transaction.setPayerWalletId(walletid);
-            transaction.setPayeeWalletId(walletid);
-            logger.info("Saving the Transaction");
-            transactionService.createTransaction(transaction);
-
-            logger.info("Money Added to the Wallet");
-            return new ResponseObject(HttpStatus.ACCEPTED, "Money Added to Wallet Successfully");
-
+        }catch (Exception e){
+            throw new BadRequestException("Money Can't Be added to Wallet due to Exception "+e.getLocalizedMessage());
         }
-        catch (Exception e)
-        {
-            logger.error("Money Not Added to the Wallet");
-            throw new BadRequestException("Failure!!!!");
 
-        }
+
     }
 
 
     @RequestMapping(path = "/wallet/{walletid}/transactions", method = RequestMethod.GET)
 
-    public List<Transaction> getAllTransaction(@PathVariable String walletid, @RequestParam int pageNo) {
+    public ResponseEntity<List<Transaction>> getAllTransaction(@PathVariable String walletid, @RequestParam int pageNo) {
         logger.info("Into the Method getting all transactions of Particular ID");
         try {
-            User user = userService.findByMobileno(walletid);
 
-//            String requestTokenUsername = getUsernameByToken();
-//            if (user.getUsername().compareTo(requestTokenUsername) != 0) {
-//                logger.error("Unauthorized !!! Use Your Own Token");
-//                throw new BadRequestException("Authentication Failed");
-//
-//             }
-            }
-        catch (Exception exception) {
-            logger.error("Transaction ID Not Found");
-            throw new BadRequestException("Not Found");
+            Page<Transaction> transactions = transactionService.getAllTransactionByWalletId(walletid,pageNo);
+            logger.debug("Fetching All transaction of WalletId :"+walletid);
+            return ResponseEntity.ok(transactions.getContent());
+        }
+        catch(Exception e){
+
+            throw new BadRequestException("Invalid Request ");
 
         }
 
-        if(walletService.getWalletById(walletid)!=null){
-            try{
-                List<Transaction> transactions = transactionService.getAllTransactionByWalletId(walletid, pageNo).getContent();
-
-                logger.info("Transactions Accessed Successfully");
-                return transactions;
-
-            }
-            catch (Exception e) {
-
-                logger.error("Transaction ID Not exist");
-                throw new BadRequestException("No Transaction exist of that particular ID");
-
-            }
-        }
-
-        else {
-            logger.error("Wallet ID Not exist");
-
-            throw new ResourceNotFoundException("Wallet ID Not Exist");
-
-        }
 
     }
 
 
 
-    @GetMapping(value = "/wallet")
+    @GetMapping(value = "/wallet/{mobileNumber}")
 
-    public List<Wallet> getWallets() {
-        return walletService.getAll();
+    public Wallet getWalletDetails(@PathVariable String mobileNumber) {
+
+        return walletService.getWalletById(mobileNumber);
 
     }
 
 
 }
+//    Authentication
+//
+//    public String getUsernameByToken(){
+//        logger.debug("Authenticating the User");
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String username = authentication.getName();
+//        logger.info("Username of Authenticated User "+username);
+//        return username;
+//    }

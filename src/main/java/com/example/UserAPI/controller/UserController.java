@@ -5,14 +5,12 @@ import com.example.UserAPI.dto.ResponseObject;
 import com.example.UserAPI.exception.BadRequestException;
 import com.example.UserAPI.model.User;
 import com.example.UserAPI.service.UserService;
-import com.example.UserAPI.validation.Validation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Date;
 import java.util.List;
@@ -28,7 +26,7 @@ public class UserController {
     private KafkaTemplate<String,String> kafkaTemplate;
     String topic = "user";
 
-    private static Logger logger = Logger.getLogger(UserController.class);
+    private static Logger logger = Logger.getLogger(UserController.class.getName());
 
 
     //This Mapping is to get all the users
@@ -75,46 +73,57 @@ public class UserController {
     public ResponseObject createUser(@RequestBody User user){
 
         logger.debug("Accessing Create User API");
-
-
-        if(userService.findByMobileno(user.getMobilenumber())==null) {
-
-            try {
-                user.setStatus("ACTIVE");
-
-                user.setCreateddate(new Date());
-
-                user.setModifieddate(new Date());
-
-                userService.saveUser(user);
-//                kafkaTemplate.send(topic,"User Created Successfully");
-                logger.info("User Created with name "+user.getFirstname()+" "+user.getLastname());
-       //         kafkaTemplate.send(topic,user.getEmail());
-                return new ResponseObject( HttpStatus.CREATED,"User Created");
-
-            }
-            catch (Exception e) {
-
-                throw new BadRequestException("User Can't Be Created");
-
-            }
-
+        try{
+            return userService.createUser(user);
+        }
+        catch (Exception exception){
+            logger.debug("User Not created with details "+user);
+            throw new BadRequestException("Can't Be Created");
         }
 
-        else
-        {
-            logger.info("Username Already Exist "+user.getUsername());
-            return new ResponseObject(HttpStatus.ALREADY_REPORTED,"User already exist");
 
-        }
+//        if(userService.findByMobileno(user.getMobilenumber())==null) {
+//
+//            try {
+//                user.setStatus("ACTIVE");
+//
+//                user.setCreateddate(new Date());
+//
+//                user.setModifieddate(new Date());
+//
+//                userService.saveUser(user);
+////                kafkaTemplate.send(topic,"User Created Successfully");
+//                logger.info("User Created with name "+user.getFirstname()+" "+user.getLastname());
+//       //         kafkaTemplate.send(topic,user.getEmail());
+//                return new ResponseObject( HttpStatus.CREATED,"User Created");
+//
+//            }
+//            catch (Exception e) {
+//
+//                throw new BadRequestException("User Can't Be Created");
+//
+//            }
+//
+//        }
+//
+//        else
+//        {
+//            logger.info("Username Already Exist "+user.getUsername());
+//            return new ResponseObject(HttpStatus.ALREADY_REPORTED,"User already exist");
+//
+//        }
     }
 
     @PutMapping(value = "/user/{id}")
     public ResponseObject updateUser(@PathVariable Long id,@RequestBody User user){
+        try {
 
-        user.setModifieddate(new Date());
-        userService.saveUser(user);
-        return new ResponseObject(HttpStatus.OK,"Updated Successfully");
+            userService.updateUser(user);
+            return new ResponseObject(HttpStatus.OK, "Updated Successfully");
+        }
+        catch (Exception exception){
+            throw new BadRequestException("User Can't Be Updated");
+        }
 
     }
 

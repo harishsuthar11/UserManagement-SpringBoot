@@ -38,6 +38,44 @@ public class TransactionController {
     @Autowired
     TransactionService transactionService;
 
+
+
+    @Test
+    public void transferMoneyTest() throws Exception {
+
+        String transactionPath = "src/test/java/com/example/UserAPI/json/TransactionDetails.json";
+        String transactionDetail = new String(Files.readAllBytes(Paths.get(transactionPath)));
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/transaction")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(transactionDetail))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String resultContent = mvcResult.getResponse().getContentAsString();
+        ResponseObject responseObject = objectMapper.readValue(resultContent, ResponseObject.class);
+        Assert.assertEquals(HttpStatus.CREATED, responseObject.getHttpStatus());
+    }
+
+    @Test
+
+    public void getTransactionTest() throws Exception{
+
+        String transactionPath = "src/test/java/com/example/UserAPI/json/TransactionDetails.json";
+        String transactionDetail = new String(Files.readAllBytes(Paths.get(transactionPath)));
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/transaction")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(transactionDetail))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String resultContent = mvcResult.getResponse().getContentAsString();
+        ResponseObject responseObject = objectMapper.readValue(resultContent, ResponseObject.class);
+        Assert.assertEquals(HttpStatus.OK, responseObject.getHttpStatus());
+
+
+    }
+
+
     public String generateToken() throws Exception {
 
 //       String username = user.getUsername();
@@ -59,43 +97,6 @@ public class TransactionController {
         String userToken = token.getJwt();
 
         return  userToken;
-
-
-    }
-
-    @Test
-    public void createTransactionTest() throws Exception {
-
-        String transactionPath = "src/test/java/com/example/UserAPI/json/TransactionDetails.json";
-        String transactionDetail = new String(Files.readAllBytes(Paths.get(transactionPath)));
-
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/transaction")
-                        .header("AUTHORIZATION","Bearer "+generateToken())
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(transactionDetail))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        String resultContent = mvcResult.getResponse().getContentAsString();
-        ResponseObject responseObject = objectMapper.readValue(resultContent, ResponseObject.class);
-        Assert.assertEquals(HttpStatus.OK, responseObject.getHttpStatus());
-    }
-
-    @Test
-
-    public void getTransactionTest() throws Exception{
-
-        String transactionPath = "src/test/java/com/example/UserAPI/json/TransactionDetails.json";
-        String transactionDetail = new String(Files.readAllBytes(Paths.get(transactionPath)));
-
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/transaction")
-                        .header("AUTHORIZATION","Bearer "+generateToken())
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(transactionDetail))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        String resultContent = mvcResult.getResponse().getContentAsString();
-        ResponseObject responseObject = objectMapper.readValue(resultContent, ResponseObject.class);
-        Assert.assertEquals(HttpStatus.OK, responseObject.getHttpStatus());
 
 
     }

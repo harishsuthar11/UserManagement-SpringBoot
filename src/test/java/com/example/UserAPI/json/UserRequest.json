@@ -5,10 +5,9 @@
   "lastname": "Suthar",
   "email": "hs11@gmail.com",
   "mobilenumber": "9999999999",
-  "address1": "Jalore",
-  "address2": "Bhinmal",
+  "address": "Jalore",
   "password": "123",
   "status": "ACTIVE",
-  "createddate": "2022-02-24T10:33:08.000+00:00",
-  "modifieddate": "2022-02-24T10:33:08.000+00:00"
+  "createddate": "2022-02-24T10:33:08.000+00:00"
+
 }

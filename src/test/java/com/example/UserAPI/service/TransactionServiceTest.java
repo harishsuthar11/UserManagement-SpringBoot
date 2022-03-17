@@ -31,10 +31,31 @@ public class TransactionServiceTest {
     public void createTransactionTest() throws IOException {
 
         String transactionPath = "src/test/java/com/example/UserAPI/json/TransactionDetails.json";
+
         String requestTransaction = new String(Files.readAllBytes(Paths.get(transactionPath)));
+
         Transaction transaction = new ObjectMapper().readValue(requestTransaction, Transaction.class);
+
         Mockito.when(transactionRepository.save(transaction)).thenReturn(transaction);
+
         Assert.assertEquals(transactionService.createTransaction(transaction),transaction);
+
+    }
+
+    @Test
+    public void gettransactionByIdTest() throws IOException{
+
+        String transactionPath = "src/test/java/com/example/UserAPI/json/TransactionDetails.json";
+
+        String requestTransaction = new String(Files.readAllBytes(Paths.get(transactionPath)));
+
+        Transaction transaction = new ObjectMapper().readValue(requestTransaction, Transaction.class);
+
+        Mockito.when(transactionRepository.findByTransactionId(transaction.getTransactionId())).thenReturn(transaction);
+
+        Transaction transaction1 = transactionService.getTransactionByTransactionId(transaction.getTransactionId());
+
+        Assert.assertEquals(transaction,transaction1);
 
     }
 

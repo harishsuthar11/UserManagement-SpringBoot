@@ -1,11 +1,18 @@
 package com.example.UserAPI.model;
 
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Data
 @Entity(name = "user")
 @Table(name="user")
@@ -25,27 +32,35 @@ public class User {
     private String lastname;
 
     @Column(name = "email",nullable = false,unique = true)
+    @Email(message = "User need valid Email")
     private String email;
 
+    @Pattern(regexp = "[0-9]+",message = "Enter Only Digits")
+    @Size(min = 10,max = 10,message = "Enter Only 10 digit mobile Number")
     @Column(name = "mobilenumber",nullable = false,unique = true)
     private String mobilenumber;
 
-    @Column(name = "address1")
-    private String address1;
+    @Column(name = "address")
+    private String address;
 
-    @Column(name="address2")
-    private String address2;
+
+
+    private boolean isActiveWallet;
+
 
     @Column(name = "password")
     private String password;
 
     private String status;
     private Date createddate;
-    private Date modifieddate;
+
     //one wallet per user
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "walletid",referencedColumnName = "walletid")
     private Wallet wallet;
+
+
+
+
 
 
 }

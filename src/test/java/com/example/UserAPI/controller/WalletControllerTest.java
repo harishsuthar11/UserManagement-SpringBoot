@@ -5,6 +5,7 @@ import com.example.UserAPI.dto.JwtResponse;
 import com.example.UserAPI.dto.ResponseObject;
 import com.example.UserAPI.service.WalletService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,7 +15,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -39,30 +39,8 @@ public class WalletControllerTest {
     @Autowired
     WalletService walletService;
 
-   public String generateToken() throws Exception {
-
-//       String username = user.getUsername();
-//       String password = user.getPassword();
-
-       JwtRequest jwtRequest = new JwtRequest("hs11","123");
-       String request = objectMapper.writeValueAsString(jwtRequest);
-
-       MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/authenticate")
-               .content(MediaType.APPLICATION_JSON_VALUE)
-               .content(request))
-               .andExpect(MockMvcResultMatchers.status().isOk())
-               .andReturn();
-
-       String result = mvcResult.getResponse().getContentAsString();
-
-       JwtResponse token = objectMapper.readValue(result,JwtResponse.class);
-
-       String userToken = token.getJwt();
-
-       return  userToken;
 
 
-    }
 
     @Test
     public void createWalletTest() throws Exception {
@@ -77,7 +55,7 @@ public class WalletControllerTest {
                 .andReturn();
         String resultContent = mvcResult.getResponse().getContentAsString();
         ResponseObject responseObject = objectMapper.readValue(resultContent, ResponseObject.class);
-        Assert.assertEquals(HttpStatus.BAD_REQUEST, responseObject.getHttpStatus());
+        Assert.assertEquals(HttpStatus.CREATED, responseObject.getHttpStatus());
     }
 
 
@@ -86,16 +64,27 @@ public class WalletControllerTest {
     public void addMoneyTest() throws Exception {
 
 
-//        String walletPath = "src/test/java/com/example/UserAPI/json/WalletDetails.json";
-//        String walletDetail = new String(Files.readAllBytes(Paths.get(walletPath)));
+       String walletPath = "src/test/java/com/example/UserAPI/json/WalletDetails.json";
+       String walletDetail = new String(Files.readAllBytes(Paths.get(walletPath)));
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/wallet/9999999999/50")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         String resultContent = mvcResult.getResponse().getContentAsString();
         ResponseObject responseObject = objectMapper.readValue(resultContent, ResponseObject.class);
-        Assert.assertEquals(HttpStatus.BAD_REQUEST, responseObject.getHttpStatus());
+        Assert.assertEquals(HttpStatus.ACCEPTED, responseObject.getHttpStatus());
+
+    }
+    @Test
+    public void getWalletDetailsByIdTest() throws Exception{
+        String walletPath = "src/test/java/com/example/UserAPI/json/WalletDetails.json";
+        String walletDetail = new String(Files.readAllBytes(Paths.get(walletPath)));
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/wallet/9999999999/50")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
 
     }
 }

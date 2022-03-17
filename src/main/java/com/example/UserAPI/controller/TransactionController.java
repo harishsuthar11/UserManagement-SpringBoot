@@ -12,10 +12,14 @@ import com.example.UserAPI.service.UserService;
 import com.example.UserAPI.service.WalletService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @RestController
 public class TransactionController {
@@ -32,84 +36,53 @@ public class TransactionController {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    private static Logger logger = Logger.getLogger(TransactionController.class);
+    private static Logger logger = Logger.getLogger(TransactionController.class.getName());
+
+    @Autowired
+    private KafkaTemplate<String,String> kafkaTemplate;
+
+    private static final String topic = "user";
 
     @RequestMapping(path = "/transaction",method = RequestMethod.POST)
 
-    public ResponseObject makeTransaction(@RequestBody Transaction transaction){
-        //GET Wallet Corresponding to Transaction
+    public ResponseObject transferMoney(@RequestBody Transaction transaction){
 
-        logger.debug("Getting Wallet ID of Payer and Payees");
-        String payer_walletId = transaction.getPayerWalletId();
-        String payee_walletId = transaction.getPayeeWalletId();
-
-        Wallet payerWallet = walletService.getWalletById(transaction.getPayerWalletId()).orElseThrow(()->new ResourceNotFoundException("Payer Wallet ID Not exist!"));
-        Wallet payeeWallet = walletService.getWalletById(transaction.getPayeeWalletId()).orElseThrow(()->new ResourceNotFoundException("Payee Wallet ID Not exist"));
-        logger.debug("Getting Balance of the Payer");
-        float currentBalancePayer=payerWallet.getBalance();
-
-        if(transaction.getAmount()>currentBalancePayer){
-            logger.warn("Insufficient Balance");
-            return new ResponseObject(HttpStatus.BAD_REQUEST,"Insufficient Balance");
-        }
-
-        float currentBalancePayee=payeeWallet.getBalance();
-
-
-        Wallet tempWallet1= payerWallet;
-        Wallet tempWallet2 = payeeWallet;
-
+        ResponseObject responseObject = transactionService.transferMoney(transaction);
         try {
-            logger.debug("Credit amount to the Payer Wallet and Debit to Payees");
-            currentBalancePayee +=transaction.getAmount();
-            currentBalancePayer += transaction.getAmount();
-            payerWallet.setBalance(currentBalancePayer);
-            payeeWallet.setBalance(currentBalancePayee);
+            if (responseObject.getHttpStatus().compareTo(HttpStatus.ACCEPTED)==0)
+            {
+                kafkaTemplate.send(topic,"Money Transferred Successfully from Wallet ID :"+transaction.getPayerWalletId()+" To Wallet ID :"+transaction.getPayeeWalletId());
+            }
 
-            transaction.setStatus("SUCCESS");
-            transaction.setTimestamp(new Timestamp(System.currentTimeMillis()));
-
-            transactionService.createTransaction(transaction);
-            logger.info("Transaction Successful"+transaction.getTransactionId());
-            walletService.updateWallet(payeeWallet);
-            walletService.updateWallet(payerWallet);
-
-            return new ResponseObject(HttpStatus.CREATED,"Transaction Successful!");
         }
-
         catch (Exception e){
-
-            walletService.updateWallet(tempWallet1);
-            walletService.updateWallet(tempWallet2);
-            transaction.setStatus("FAILED");
-            transaction.setTimestamp(new Timestamp(System.currentTimeMillis()));
-            transactionService.createTransaction(transaction);
-            logger.error("Transaction Failed");
-            throw new BadRequestException("Transaction failed");
-
+            throw new RuntimeException("can't push event in kafka");
         }
+        return responseObject;
+
     }
 
-    @RequestMapping(path = "/transaction",method = RequestMethod.GET)
+    @RequestMapping(path = "/transaction/{id}",method = RequestMethod.GET)
+    public ResponseEntity<List<Transaction>> getTransactionById(@RequestParam Long id,@RequestParam int pageNo){
 
-    public Transaction getTransactionById(@RequestParam Long transactionId){
+        Page<Transaction> transactions = transactionService.getAllTransactionByUserId(id,pageNo);
+        logger.debug("Fetching All transaction of user Id "+id);
+        return ResponseEntity.ok(transactions.getContent());
 
-        Transaction transaction;
+    }
+
+    @GetMapping("/transaction")
+    public String getStatusByTransactionId(@RequestParam Long transactionId){
 
         try{
-             logger.debug("Getting Transaction by TransactionId");
-             transaction = transactionRepository.findByTransactionId(transactionId);
 
+            Transaction transaction = transactionService.getTransactionByTransactionId(transactionId);
+            logger.debug("Fetching transaction Status of txn Id :"+transactionId);
+            return transaction.getStatus();
         }
-
         catch (Exception e){
-            logger.error("Transaction ID Not exist");
-            throw new ResourceNotFoundException("TransactionID not exist");
-
+            throw new ResourceNotFoundException("Transaction ID not exist");
         }
-
-        return transaction;
-
     }
 }
 

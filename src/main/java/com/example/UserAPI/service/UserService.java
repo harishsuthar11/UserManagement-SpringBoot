@@ -2,6 +2,7 @@ package com.example.UserAPI.service;
 
 
 import com.example.UserAPI.dto.ResponseObject;
+import com.example.UserAPI.exception.BadRequestException;
 import com.example.UserAPI.exception.ResourceNotFoundException;
 import com.example.UserAPI.model.User;
 
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -45,14 +47,38 @@ public class UserService {
 
     }
     @Transactional
-    public User saveUser(User user){
+    public ResponseObject createUser(User user){
 
+        user.setStatus("ACTIVE");
+        user.setCreateddate(new Date());
+        user.setActiveWallet(false);
+        if(userRepository.findByUsername(user.getUsername())!=null||userRepository.findByMobilenumber(user.getMobilenumber())!=null){
+            logger.warn("Username or Mobile Number already exist");
+            return new ResponseObject(HttpStatus.BAD_REQUEST,"User Already Exist");
+        }
+        try{
+            userRepository.save(user);
+            logger.info("User Created with Name:"+user.getFirstname()+" "+user.getLastname());
+            return new ResponseObject(HttpStatus.CREATED,"User Created Successfully");
+        }
+        catch (Exception exception){
+            throw new BadRequestException("User Can't Be Created "+user);
+        }
 
-        return userRepository.save(user);
     }
     public void updateUser(User user){
 
-        userRepository.save(user);
+        try{
+
+            userRepository.save(user);
+            logger.info("Updated User "+user);
+
+        }
+        catch (Exception exception){
+            throw  new RuntimeException("User Can't Be Updated");
+        }
+
+
 
     }
     @Transactional

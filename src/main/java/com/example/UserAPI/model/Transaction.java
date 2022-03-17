@@ -1,18 +1,22 @@
 package com.example.UserAPI.model;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
+
+@NoArgsConstructor
 @Entity(name="transaction")
 @Data
 @Table(name="transaction")
 public class Transaction {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long transactionId;
 
     @Column(name = "payerWalletId",nullable = false)

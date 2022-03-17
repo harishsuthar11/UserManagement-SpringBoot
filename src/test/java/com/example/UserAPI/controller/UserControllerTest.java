@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -37,31 +39,6 @@ public class UserControllerTest {
 
     @Autowired
     UserService userService;
-
-    public String generateToken(User user) throws Exception {
-
-        String username = user.getUsername();
-        String password = user.getPassword();
-
-        JwtRequest jwtRequest = new JwtRequest(username,password);
-        String request = objectMapper.writeValueAsString(jwtRequest);
-
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/authenticate")
-                        .content(MediaType.APPLICATION_JSON_VALUE)
-                        .content(request))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-
-        String result = mvcResult.getResponse().getContentAsString();
-
-        JwtResponse token = objectMapper.readValue(result,JwtResponse.class);
-
-        String userToken = token.getJwt();
-
-        return  userToken;
-
-
-    }
 
     @Test
     public void createUserTest() throws Exception{
@@ -99,5 +76,34 @@ public class UserControllerTest {
 
 
 
+
+
     }
+
+    public String generateToken(User user) throws Exception {
+
+        String username = user.getUsername();
+        String password = user.getPassword();
+
+        JwtRequest jwtRequest = new JwtRequest(username,password);
+        String request = objectMapper.writeValueAsString(jwtRequest);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/authenticate")
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .content(request))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        String result = mvcResult.getResponse().getContentAsString();
+
+        JwtResponse token = objectMapper.readValue(result,JwtResponse.class);
+
+        String userToken = token.getJwt();
+
+        return  userToken;
+
+
+    }
+
+
 }

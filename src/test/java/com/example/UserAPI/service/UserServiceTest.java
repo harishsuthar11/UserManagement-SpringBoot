@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
 
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class UserServiceTest {
 
         Mockito.when(userRepository.save(user)).thenReturn(user);
 
-        Assert.assertEquals(userService.saveUser(user),user);
+        Assert.assertEquals(userService.createUser(user).getHttpStatus(), HttpStatus.CREATED);
 
     }
     //Test for Find By UserName
